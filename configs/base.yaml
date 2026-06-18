@@ -1,0 +1,58 @@
+model:
+  type: grvae
+  layers_transformer: 1
+  rope: True
+  window_size: 8
+  dim_forward: 512
+  proj_dim: 4
+
+dataset: 'mc'
+save_dir: checkpoints
+
+data:
+  train_dir: "./data/train"
+  val_dir: "./data/val"
+  num_workers: 2
+  batch_size: 2
+  scale: 1
+
+training:
+  lr: 1e-4
+  accelerator: auto
+  devices: auto
+  deterministic: false
+  checkpoint_dir: "checkpoints"
+
+wandb:
+  project: "GRWM-cvpr"
+
+debug: false
+
+optimizer:
+  cls: Adam
+  kwargs:
+    lr: ${training.lr}
+
+scheduler:
+  cls: "warmup_linear"
+  kwargs:
+    warmup_steps: 1000
+    max_steps: 40_000
+    min_lr_ratio: 0.1
+
+loss:
+  cls: MaskedLPIPSWithDiscriminator
+  kwargs:
+    target_key: "image"
+    pixelloss_weight: 10.0
+    perceptual_weight: 0.0
+    disc_weight: 0.001
+    kl_weight: 0.000001
+    disc_factor: 1.0
+    disc_num_layers: 3
+    disc_in_channels: 3
+    disc_ndf: 64
+    disc_loss: "hinge"
+    pixel_loss: "l1"
+    use_actnorm: false
+    skip_size: 0

@@ -1,0 +1,15 @@
+__pycache__/
+.ipynb_checkpoints/
+*.py[cod]
+
+logs/
+outputs/
+ckpts/
+checkpoints/
+wandb/
+
+*.ckpt
+*.pth
+*.pt
+
+launch_notebook_local.sh

@@ -1,0 +1,23 @@
+model:
+  model_name: "vae-64"
+  map_size: (4,4,4)
+  layers_transformer: 0
+
+data:
+  size: 32
+  batch_size: 8
+  max_length: 64
+  train_subset_size: 4096
+  val_subset_size: 256
+  subset_seed: 9
+  subset_shuffle: true
+
+training:
+  epochs: 20
+
+loss:
+  kwargs:
+    disc_start: 5000
+    slow_weight: 0.0
+    uniform_weight: 0.0
+
