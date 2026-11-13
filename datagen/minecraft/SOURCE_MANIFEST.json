@@ -1,0 +1,26 @@
+{
+  "description": "SHA-256 of the source files before portability edits. Assets and mc.h5 (on Hugging Face) are copied unchanged; the two scripts only had hard-coded paths replaced by CLI arguments (plus --seed and --limit).",
+  "sha256_original": {
+    "01_generate_trajectories.py": "c8ffe56a4fb530317c2cfa6eea7b6f097ad91502ef1fc935884c0d9328508170",
+    "02_render_blender.py": "87c8efcbb1ee6a8ded32cf2cfed9520714d33424cb10022ccae9b63ff61ba092",
+    "assets/maze.npy": "2725c49121c33f51fcd8836e3bb595e8fad9ad22c038f06c3ec282fe02f3382d",
+    "assets/fence.obj": "3d4f5258071aacdd6015a8d8b5ae076d9b8cdc4dd1e2ef5b48c355b0401523a4",
+    "assets/fence.mtl": "b288bbe0409025c9f07a522fb3c738c392a3c9ffe194bff63a6aa04393990195",
+    "assets/fence.7z": "b0a9c23f589eb064d9eadfa4da6bf63567d0438da08b2986ea92765d0bcb2c06",
+    "data/mc.h5": "2d8a37d9b0433578c722a03ec5121a7144418173ecfeffbd28408a9a5720d785"
+  },
+  "sha256_tex": {
+    "assets/tex/bedrock.png": "80f642b4667d18ef6119fc16faf8198a20f8d05c8d8be298ffa531d6c2089138",
+    "assets/tex/dirt.png": "a9708439f4be128d132aa99557919d93b1676798a7fdc9ef732fade0acdc293e",
+    "assets/tex/grass_block_side_y.png": "174f958d5fe8242717ef9a45dcd5453fe8eb7ea927ccad9564e0bebb2d9dd671",
+    "assets/tex/grass_block_top_y.png": "39a5278d494c02b4d69500eec4e3b4ce9944b9068bca1de6118c593b4cad8ac1",
+    "assets/tex/oak_leaves_y.png": "e27aaeb36edc00e31a1eb2b4ff081bd6f0f430270ee4cc6f1a1b02e5b6fbc98e",
+    "assets/tex/oak_log.png": "1e3012fc75dceedaddbf5be7324c872548855e4056c80db5de44b121e3620b7c",
+    "assets/tex/oak_log_top.png": "85609f06962cc724fbdc0a606531b60b5ce3e6732642b9af8f32b40717894620",
+    "assets/tex/oak_planks.png": "e9fe71064a295b3a64a78a5970af6253e506ab5b7a4627494f77b9cea3c65e5f",
+    "assets/tex/stone.png": "13842d33c4fb2858f265d76f869669f7c11a04490380c5a0a95ff02eacf9a6e0",
+    "assets/tex/torch.png": "9ff9b7d60e7d7fcb43e3df4cdf332596704231678c3d33c8e40828c0ab3e446e",
+    "assets/tex/water_flow_y.png": "8e10fd4c83feb70c359a11f1ab1063b5af0c4758f85387f424eb7dc2531063ce",
+    "assets/tex/water_still_y.png": "90df08d9f5798e16626654015f8908160559a281f7bf7fae3607ef6352303bf9"
+  }
+}

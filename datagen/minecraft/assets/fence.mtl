@@ -1,0 +1,166 @@
+Wavefront OBJ material file
+# Contains 12 materials
+
+newmtl grass_block_top
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/grass_block_top_y.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/grass_block_top_y.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl stone
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/stone.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/stone.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl dirt
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/dirt.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/dirt.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl grass_block_side
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/grass_block_side_y.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/grass_block_side_y.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl oak_planks
+Ns 127.5
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0.15 0.15 0.15
+map_Ka tex/oak_planks.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/oak_planks.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl bedrock
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/bedrock.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/bedrock.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl oak_log
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/oak_log.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/oak_log.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl oak_log_top
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/oak_log_top.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/oak_log_top.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl oak_leaves
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+map_Ka tex/oak_leaves_y.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/oak_leaves_y.png
+map_d tex/oak_leaves_y.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl torch
+Ns 0
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0 0 0
+Ke 0.901686 0.901686 0.901686
+map_Ka tex/torch.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/torch.png
+map_d tex/torch.png
+map_Ke tex/torch.png
+illum 2
+# d 1
+# Tr 0
+
+newmtl water_still
+Ns 216.75
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0.03 0.03 0.03
+map_Ka tex/water_still_y.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/water_still_y.png
+map_d tex/water_still_y.png
+illum 4
+# d 0.535
+# Tr 0.465
+Tf 0.465 0.465 0.465
+
+newmtl water_flow
+Ns 216.75
+Ka 0.2 0.2 0.2
+Kd 1 1 1
+Ks 0.03 0.03 0.03
+map_Ka tex/water_flow_y.png
+# for G3D, to make textures look blocky:
+interpolateMode NEAREST_MAGNIFICATION_TRILINEAR_MIPMAP_MINIFICATION
+map_Kd tex/water_flow_y.png
+map_d tex/water_flow_y.png
+illum 4
+# d 0.535
+# Tr 0.465
+Tf 0.465 0.465 0.465
