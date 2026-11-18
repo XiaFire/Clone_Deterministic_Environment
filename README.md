@@ -98,7 +98,21 @@ Main paths and runtime settings can be changed through environment variables. Fo
 export LATENT_ROOT=/path/to/cache_dir
 ```
 
-Model and evaluation defaults are defined in the run script and `configs/mc_unet_maze9.yaml`.
+Model and evaluation defaults are defined in the run script and `configs/dit2d_maze9.yaml`.
+
+## Dynamics Model
+
+The default dynamics model is a diffusion-forcing transformer (`dit2d`) over flattened 64-d latent vectors, with per-dimension latent normalisation. Before dynamics training, the script computes the statistics of each latent cache with `scripts/compute_latent_stats.py`, writing `stats_mean.npy` and `stats_std.npy` next to the cache, and uses the same files at evaluation.
+
+The 3D U-Net dynamics from the initial release is still available:
+
+```bash
+export DYN_CONFIG=configs/mc_unet_maze9.yaml
+export DYN_X_SHAPE='[4,4,4]'
+export DYN_NOISE_LEVEL=random_uniform
+export SAMPLE_METHOD=3d
+export DYN_LATENT_STATS=False
+```
 
 ## Outputs
 
