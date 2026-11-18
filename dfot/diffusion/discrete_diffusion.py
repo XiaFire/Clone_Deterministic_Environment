@@ -50,14 +50,19 @@ class DiscreteDiffusion(nn.Module):
         print(f"decoder: {self.decoder}")
 
     def _build_model(self):
-        if self.backbone_cfg.name != "u_net3d":
+        if self.backbone_cfg.name == "u_net3d":
+            from ..backbones.u_net import Unet3D
+
+            model_cls = Unet3D
+        elif self.backbone_cfg.name == "dit2d":
+            from ..backbones.dit import DiT2D
+
+            model_cls = DiT2D
+        else:
             raise ValueError(
                 f"unknown model type {self.backbone_cfg.name}; "
-                "this minimal Maze9 release supports u_net3d only"
+                "this Maze9 release supports dit2d and u_net3d"
             )
-        from ..backbones.u_net import Unet3D
-
-        model_cls = Unet3D
         self.model = model_cls(
             cfg=self.backbone_cfg,
             x_shape=self.x_shape,

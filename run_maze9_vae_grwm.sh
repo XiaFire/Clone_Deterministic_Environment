@@ -34,7 +34,13 @@ EVAL_BATCH_SIZE="${EVAL_BATCH_SIZE:-32}"
 PRE_K="${PRE_K:-15}"
 CONTEXT_LEN="${CONTEXT_LEN:-15}"
 SAMPLING_TIMESTEPS="${SAMPLING_TIMESTEPS:-10}"
-DYN_CONFIG="${DYN_CONFIG:-configs/mc_unet_maze9.yaml}"
+DYN_CONFIG="${DYN_CONFIG:-configs/dit2d_maze9.yaml}"
+# Defaults are for the dit2d dynamics. The previous 3D U-Net setting is
+# DYN_CONFIG=configs/mc_unet_maze9.yaml DYN_X_SHAPE=[4,4,4] DYN_NOISE_LEVEL=random_uniform SAMPLE_METHOD=3d DYN_LATENT_STATS=False
+DYN_X_SHAPE="${DYN_X_SHAPE:-[64]}"
+DYN_NOISE_LEVEL="${DYN_NOISE_LEVEL:-random_independent}"
+SAMPLE_METHOD="${SAMPLE_METHOD:-2d}"
+DYN_LATENT_STATS="${DYN_LATENT_STATS:-True}"
 
 LATENT_ROOT="${LATENT_ROOT:-$(dirname "$TRAIN_DIR")}"
 
@@ -52,6 +58,13 @@ GRWM_DYN_NAME="${GRWM_DYN_NAME:-maze9_grwm32_len64_latent_pred_steps${DYNAMICS_S
 
 VAE_EVAL_NAME="${VAE_EVAL_NAME:-maze9_vae32_dyna${DYNAMICS_STEPS}_sample${SAMPLING_TIMESTEPS}_p${PRE_K}c${CONTEXT_LEN}}"
 GRWM_EVAL_NAME="${GRWM_EVAL_NAME:-maze9_grwm32_dyna${DYNAMICS_STEPS}_sample${SAMPLING_TIMESTEPS}_p${PRE_K}c${CONTEXT_LEN}}"
+
+latent_stats_overrides() {
+  local latent_dir="$1"
+  if [[ "$DYN_LATENT_STATS" == "True" ]]; then
+    echo "data_mean=${latent_dir}/stats_mean.npy data_std=${latent_dir}/stats_std.npy"
+  fi
+}
 
 count_csv_items() {
   local value="$1"
@@ -145,6 +158,14 @@ run_dynamics() {
   local log_file="$4"
 
   echo "[$(date '+%F %T')] Dynamics train ${label}: steps=${DYNAMICS_STEPS}" | tee "$log_file"
+  if [[ "$DYN_LATENT_STATS" == "True" ]]; then
+    python scripts/compute_latent_stats.py \
+      --latent_dir "${latent_dir}/train" \
+      --out_prefix "${latent_dir}/stats" \
+      2>&1 | tee -a "$log_file"
+  fi
+  local stats_overrides
+  read -r -a stats_overrides <<< "$(latent_stats_overrides "$latent_dir")"
   stdbuf -oL -eL python dyna_efficient.py \
     --name "$name" \
     --config "$DYN_CONFIG" \
@@ -164,8 +185,9 @@ run_dynamics() {
     --context_len "$CONTEXT_LEN" \
     --load_images False \
     --size 32 \
-    'x_shape=[4,4,4]' \
-    noise_level=random_uniform \
+    "x_shape=${DYN_X_SHAPE}" \
+    "noise_level=${DYN_NOISE_LEVEL}" \
+    "${stats_overrides[@]}" \
     lr_scheduler.num_warmup_steps=500 \
     "lr_scheduler.num_training_steps=${DYNAMICS_STEPS}" \
     2>&1 | tee -a "$log_file"
@@ -182,6 +204,8 @@ run_mse_part() {
   local log_prefix="$8"
   local part_name="${name}_part${part_idx}"
   local log_file="logs/maze9/${log_prefix}_part${part_idx}.log"
+  local stats_overrides
+  read -r -a stats_overrides <<< "$(latent_stats_overrides "$metadata_dir")"
 
   echo "[$(date '+%F %T')] Eval ${part_name}: gpu=${gpu}" | tee "$log_file"
   stdbuf -oL -eL python evaluate_maze9_rollout_mse.py \
@@ -199,11 +223,12 @@ run_mse_part() {
     --batch_size "$EVAL_BATCH_SIZE" \
     --pre_k "$PRE_K" \
     --context_len "$CONTEXT_LEN" \
-    --sample_method 3d \
+    --sample_method "$SAMPLE_METHOD" \
     --size 32 \
     --gpu "$gpu" \
-    'x_shape=[4,4,4]' \
-    noise_level=random_uniform \
+    "x_shape=${DYN_X_SHAPE}" \
+    "noise_level=${DYN_NOISE_LEVEL}" \
+    "${stats_overrides[@]}" \
     "diffusion.sampling_timesteps=${SAMPLING_TIMESTEPS}" \
     2>&1 | tee -a "$log_file"
 }
@@ -297,7 +322,7 @@ PY
 }
 
 append_table_rows() {
-  VAE_EVAL_NAME="$VAE_EVAL_NAME" GRWM_EVAL_NAME="$GRWM_EVAL_NAME" SAMPLING_TIMESTEPS="$SAMPLING_TIMESTEPS" python - <<'PY'
+  VAE_EVAL_NAME="$VAE_EVAL_NAME" GRWM_EVAL_NAME="$GRWM_EVAL_NAME" SAMPLING_TIMESTEPS="$SAMPLING_TIMESTEPS" DYN_NOISE_LEVEL="$DYN_NOISE_LEVEL" python - <<'PY'
 import json
 import os
 from pathlib import Path
@@ -322,7 +347,7 @@ for name in [os.environ["VAE_EVAL_NAME"], os.environ["GRWM_EVAL_NAME"]]:
         "pre_k": data["pre_k"],
         "context_len": data["context_len"],
         "sample_method": data["sample_method"],
-        "noise_level": "random_uniform",
+        "noise_level": os.environ["DYN_NOISE_LEVEL"],
         "diffusion_sampling_timesteps": int(os.environ["SAMPLING_TIMESTEPS"]),
         "mse_255_global_mean": data["mse_255_global_mean"],
         "mse_255_global_std": data["mse_255_global_std"],

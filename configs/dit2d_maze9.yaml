@@ -1,0 +1,65 @@
+defaults:
+  - backbone: dit2d
+
+# Diffusion-forcing transformer over flattened latent vectors (the backbone used for the paper's Maze9 results).
+# data_mean / data_std must point to per-dimension latent statistics (scripts/compute_latent_stats.py).
+x_shape: [64]
+max_tokens: 100
+compile: false
+
+data_mean: 0.0
+data_std: 1
+
+weight_decay: 1e-4
+optimizer_beta: [0.9, 0.99]
+
+lr_scheduler:
+  name: decay_with_warmup
+  num_warmup_steps: 1000
+  num_training_steps: 80000
+
+noise_level: random_independent
+
+uniform_future:
+  enabled: false
+
+fixed_context:
+  enabled: false
+  indices: null
+  dropout: 0
+
+variable_context:
+  enabled: false
+  prob: 0
+  dropout: 0
+
+diffusion:
+  is_continuous: false
+  timesteps: 1000
+  beta_schedule: cosine
+  schedule_fn_kwargs:
+    shift: 10.0
+  use_causal_mask: true
+  external_cond_levels: 4
+  clip_noise: 20.0
+  objective: pred_v
+  loss_weighting:
+    strategy: fused_min_snr
+    snr_clip: 20.0
+    cum_snr_decay: 0.9
+  sampling_timesteps: 10
+  ddim_sampling_eta: 0.0
+
+logging:
+  loss_freq: 100
+  grad_norm_freq: 100
+
+backbone:
+  name: dit2d
+  input_size: 64
+  dim_feedforward: 768
+  nhead: 4
+  num_layers: 4
+  action_levels: 4
+  noise_level_dim: 256
+  use_fourier_noise_embedding: false

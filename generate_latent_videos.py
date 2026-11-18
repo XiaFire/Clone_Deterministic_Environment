@@ -208,7 +208,7 @@ def rollout_latent_trajectory(
             or getattr(config, "context_len", getattr(config, "n_context_tokens", getattr(config, "max_tokens", 5)))
         ),
     )
-    mode = sample_method or getattr(config, "sample_method", "3d")
+    mode = sample_method or getattr(config, "sample_method", "3d" if xs.ndim == 5 else "2d")
 
     for step in range(start_step, xs.shape[1]):
         start = max(0, step - window)
