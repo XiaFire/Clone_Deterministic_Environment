@@ -1,137 +1,68 @@
 # Cloning Deterministic Worlds
 
-Official code release for **Cloning Deterministic Worlds: The Critical Role of Latent Geometry in Long-Horizon World Models**.
+Code for **Cloning Deterministic Worlds: The Critical Role of Latent Geometry in Long-Horizon World Models** (CVPR 2026) · [arXiv](https://arxiv.org/abs/2510.26782) · [Maze9 data](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-maze9) · [MC data](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-mc)
 
-This repository provides code for training and evaluating two latent-space world model pipelines on the Maze9 dataset:
+<p align="center"><img src="assets/maze9_rollouts.gif" width="744"></p>
+<p align="center"><sub>World-model rollouts on held-out Maze9 trajectories: 15 given frames, then 48 predicted steps from actions alone.</sub></p>
 
-- **VAE baseline**: train an autoencoder, precompute latents, train a dynamics model in VAE latent space, then evaluate pixel-space rollout error.
-- **GRWM**: train a GRWM autoencoder, precompute latents, train a dynamics model in GRWM latent space, then evaluate pixel-space rollout error.
+GRWM adds a geometric regularizer to a standard autoencoder so that its latent space follows the environment's state manifold. A world model trained in this latent space drifts less over long rollouts than the same model trained in a VAE latent space.
 
-## Dataset
+## Latent geometry
 
-Download the Maze9 data:
+<p align="center"><img src="assets/latent_geometry.jpg" width="100%"></p>
 
-- Training set (`9x9_n0.8`): [download](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-maze9/tree/main/9x9_n0.8)
-- Validation set (`9x9_val`): [download](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-maze9/tree/main/9x9_val)
+Each point is a frame drawn at the agent's true position, colored by the k-means cluster of its latent. GRWM latents of nearby positions stay together; VAE latents do not.
 
-The Maze3x3 dataset will also be released.
+## Results (Maze9)
 
-After downloading, set the training and validation directories:
+<p align="center"><img src="assets/maze9_rollout_mse.png" width="640"></p>
 
-```bash
-export TRAIN_DIR=/path/to/9x9_n0.8
-export VAL_DIR=/path/to/9x9_val
-```
+| | VAE | GRWM | GRWM / VAE |
+|---|---|---|---|
+| AE pair 1 | 0.118 | 0.062 | 0.52 |
+| AE pair 2 | 0.104 | 0.087 | 0.84 |
+| AE pair 3 | 0.104 | 0.077 | 0.74 |
+| AE pair 4 | 0.150 | 0.107 | 0.72 |
 
-Each dataset directory should use the Maze dataset format expected by this repository, including `info.hdf5` and `obs/*.npy`.
+Pixel MSE of 48-step rollouts from 15 context frames on 1000 validation windows, for 4 independently trained AE pairs (lines: mean, bands: range). The oracle rolls out the true state (x, y, heading) and stays at the renderer floor (0.00036).
 
-### Minecraft (MC-DET)
+## Long-horizon rollouts
 
-The MC trajectories are on Hugging Face: [`xiazaishuo/cloning-deterministic-worlds-mc`](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-mc). The 256×256 frames are about 600 GB, so they are not hosted. Render them locally with Blender instead; rendering reproduces our frames bit for bit. See [`datagen/minecraft/README.md`](datagen/minecraft/README.md) for rendering and for the train/validation split. The resulting directories load with `dataset=mc` (`data/mc.py`).
+<p align="center"><img src="assets/long_rollout_maze9.jpg" width="100%"></p>
+<p align="center"><img src="assets/long_rollout_mc.jpg" width="100%"></p>
 
-## Environment
+Rows: ground truth, VAE world model, GRWM. Top: Maze9, frames 100–404. Bottom: Minecraft (MC-DET), frames 20–102.
 
-Create or activate a Python environment, then install the dependencies from this directory:
+## Quick start
 
 ```bash
 pip install -r requirements.txt
+
+# Maze9 from Hugging Face: 9x9_n0.8 (train) and 9x9_val (validation)
+export TRAIN_DIR=/path/to/9x9_n0.8
+export VAL_DIR=/path/to/9x9_val
+
+bash run_maze9_vae_grwm.sh            # all stages
+# or one stage at a time: ae | precompute | dynamics | eval
 ```
 
-For non-interactive shells or tmux jobs, you can let the script activate the environment:
+The script trains both autoencoders, caches their latents, trains a diffusion-forcing transformer (`configs/dit2d_maze9.yaml`) in each latent space, and evaluates the rollouts. Metrics and a per-step plot are written to `outputs/maze9_metrics/`. To inspect the latents and per-step errors, open `visualization/maze9_latent_clustering_and_mse.ipynb`.
 
-```bash
-export CONDA_SH=/path/to/miniconda3/etc/profile.d/conda.sh
-export CONDA_ENV=grwm
-```
+Common settings:
 
-Weights & Biases logging is disabled by default. To enable online logging:
+| Variable | Default | |
+|---|---|---|
+| `AE_GPU_VAE`, `AE_GPU_GRWM` | `0`, `1` | one GPU per autoencoder |
+| `PRECOMPUTE_GPUS`, `DYNAMICS_GPUS`, `PART_GPUS` | `0,...,7` | GPUs for the later stages |
+| `LATENT_ROOT` | parent of `TRAIN_DIR` | where latents are cached |
+| `WANDB_MODE` | `disabled` | set to `online` to log |
+| `CONDA_SH`, `CONDA_ENV` | unset, `grwm` | activate an environment inside tmux jobs |
 
-```bash
-export WANDB_MODE=online
-```
+All settings are environment variables, with their defaults at the top of `run_maze9_vae_grwm.sh`.
 
-## Run Everything
+## Minecraft (MC-DET)
 
-From this directory:
-
-```bash
-bash run_maze9_vae_grwm.sh
-```
-
-By default, the VAE and GRWM autoencoders are trained in parallel on one GPU each:
-
-```bash
-export AE_GPU_VAE=0
-export AE_GPU_GRWM=1
-```
-
-Precomputation, dynamics training, and evaluation can use multiple GPUs:
-
-```bash
-export PRECOMPUTE_GPUS=0,1,2,3,4,5,6,7
-export DYNAMICS_GPUS=0,1,2,3,4,5,6,7
-export PART_GPUS=0,1,2,3,4,5,6,7
-```
-
-## Run by Stage
-
-The pipeline can also be resumed stage by stage:
-
-```bash
-bash run_maze9_vae_grwm.sh ae
-bash run_maze9_vae_grwm.sh precompute
-bash run_maze9_vae_grwm.sh dynamics
-bash run_maze9_vae_grwm.sh eval
-```
-
-## Visualization Notebook
-
-After training and evaluation, open the notebook to visualize the two autoencoder checkpoints and rollout metrics:
-
-```bash
-jupyter lab visualization/maze9_latent_clustering_and_mse.ipynb
-```
-
-The notebook shows latent KMeans clusters on the Maze9 training-set `(x, y)` plane and plots VAE vs GRWM rollout MSE per step.
-
-## Common Overrides
-
-Main paths and runtime settings can be changed through environment variables. For example:
-
-```bash
-export LATENT_ROOT=/path/to/cache_dir
-```
-
-Model and evaluation defaults are defined in the run script and `configs/dit2d_maze9.yaml`.
-
-## Dynamics Model
-
-The default dynamics model is a diffusion-forcing transformer (`dit2d`) over flattened 64-d latent vectors, with per-dimension latent normalisation. Before dynamics training, the script computes the statistics of each latent cache with `scripts/compute_latent_stats.py`, writing `stats_mean.npy` and `stats_std.npy` next to the cache, and uses the same files at evaluation.
-
-The 3D U-Net dynamics from the initial release is still available:
-
-```bash
-export DYN_CONFIG=configs/mc_unet_maze9.yaml
-export DYN_X_SHAPE='[4,4,4]'
-export DYN_NOISE_LEVEL=random_uniform
-export SAMPLE_METHOD=3d
-export DYN_LATENT_STATS=False
-```
-
-## Outputs
-
-The script writes:
-
-- autoencoder checkpoints under `checkpoints/`
-- precomputed latents under `LATENT_ROOT`
-- dynamics checkpoints under `ckpts/`
-- rollout metrics and plots under `outputs/maze9_metrics/`
-
-The final comparison plot is saved as:
-
-```text
-outputs/maze9_metrics/maze9_vae_vs_grwm_norm_mse_per_step.pdf
-```
+Trajectories are on [Hugging Face](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-mc). Frames are rendered locally with Blender and reproduce ours bit for bit; see [`datagen/minecraft/README.md`](datagen/minecraft/README.md).
 
 ## Citation
 
