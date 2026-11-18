@@ -13,3 +13,6 @@ wandb/
 *.pt
 
 launch_notebook_local.sh
+
+datagen/minecraft/data/
+datagen/minecraft/datasets/

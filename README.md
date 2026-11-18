@@ -14,7 +14,7 @@ Download the Maze9 data:
 - Training set (`9x9_n0.8`): [download](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-maze9/tree/main/9x9_n0.8)
 - Validation set (`9x9_val`): [download](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-maze9/tree/main/9x9_val)
 
-The Maze3x3 and MC datasets will also be released.
+The Maze3x3 dataset will also be released.
 
 After downloading, set the training and validation directories:
 
@@ -24,6 +24,10 @@ export VAL_DIR=/path/to/9x9_val
 ```
 
 Each dataset directory should use the Maze dataset format expected by this repository, including `info.hdf5` and `obs/*.npy`.
+
+### Minecraft (MC-DET)
+
+The MC trajectories are on Hugging Face: [`xiazaishuo/cloning-deterministic-worlds-mc`](https://huggingface.co/datasets/xiazaishuo/cloning-deterministic-worlds-mc). The 256×256 frames are about 600 GB, so they are not hosted. Render them locally with Blender instead; rendering reproduces our frames bit for bit. See [`datagen/minecraft/README.md`](datagen/minecraft/README.md) for rendering and for the train/validation split. The resulting directories load with `dataset=mc` (`data/mc.py`).
 
 ## Environment
 
